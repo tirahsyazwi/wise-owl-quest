@@ -145,8 +145,21 @@ const DashboardPage = () => {
   };
 
   const handleSelectMission = (mission: Mission) => {
+    // Gate: check mission limit for trial users
+    if (maxMissions > 0 && completedMissions.length >= maxMissions && !completedMissions.includes(mission.id)) {
+      toast.error("Mission limit reached! Upgrade your plan to unlock more.", { action: { label: "Upgrade", onClick: () => navigate("/pricing") } });
+      return;
+    }
     setActiveMission(mission);
     setActiveTab("mission");
+  };
+
+  const handleAddChild = () => {
+    if (maxChildren > 0 && children.length >= maxChildren) {
+      toast.error(`Your plan allows ${maxChildren} child profile${maxChildren > 1 ? "s" : ""}. Upgrade to add more!`, { action: { label: "Upgrade", onClick: () => navigate("/pricing") } });
+      return;
+    }
+    setShowAddChild(true);
   };
 
   const handleMissionComplete = async (result: MissionResult) => {
