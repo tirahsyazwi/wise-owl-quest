@@ -125,6 +125,7 @@ const DashboardPage = () => {
     { id: "home", label: "Home", icon: Rocket },
     { id: "map", label: "Map", icon: Map },
     { id: "mission", label: "Mission", icon: Gamepad2 },
+    { id: "achievements", label: "Badges", icon: Trophy },
     { id: "parent", label: "Parent", icon: BarChart3 },
   ];
 
