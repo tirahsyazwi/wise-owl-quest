@@ -287,11 +287,14 @@ const DashboardPage = () => {
                   {child.name}
                 </button>
               ))}
-              <button onClick={() => setShowAddChild(true)} className="rounded-full p-1 text-muted-foreground hover:text-primary">
+              <button onClick={handleAddChild} className="rounded-full p-1 text-muted-foreground hover:text-primary">
                 <Plus className="h-4 w-4" />
               </button>
             </div>
           )}
+          <button onClick={() => navigate("/settings")} className="rounded-lg p-2 text-muted-foreground hover:text-foreground">
+            <Settings className="h-4 w-4" />
+          </button>
           <button onClick={handleSignOut} className="rounded-lg p-2 text-muted-foreground hover:text-foreground">
             <LogOut className="h-4 w-4" />
           </button>
