@@ -44,6 +44,62 @@ export type Database = {
         }
         Relationships: []
       }
+      mission_attempts: {
+        Row: {
+          attempts: number
+          child_id: string
+          coins_earned: number
+          completed: boolean
+          created_at: string
+          difficulty: number
+          hints_used: number
+          id: string
+          mission_id: string
+          mission_type: string
+          parent_id: string
+          solve_time_seconds: number | null
+          xp_earned: number
+        }
+        Insert: {
+          attempts?: number
+          child_id: string
+          coins_earned?: number
+          completed?: boolean
+          created_at?: string
+          difficulty?: number
+          hints_used?: number
+          id?: string
+          mission_id: string
+          mission_type: string
+          parent_id: string
+          solve_time_seconds?: number | null
+          xp_earned?: number
+        }
+        Update: {
+          attempts?: number
+          child_id?: string
+          coins_earned?: number
+          completed?: boolean
+          created_at?: string
+          difficulty?: number
+          hints_used?: number
+          id?: string
+          mission_id?: string
+          mission_type?: string
+          parent_id?: string
+          solve_time_seconds?: number | null
+          xp_earned?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_attempts_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

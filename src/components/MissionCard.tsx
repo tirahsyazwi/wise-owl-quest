@@ -1,12 +1,23 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NovaOwl from "./NovaOwl";
 import RewardBadge from "./RewardBadge";
 import { Mission, getTypeLabel, getTypeColor } from "@/data/missionBank";
 
+export interface MissionResult {
+  missionId: string;
+  missionType: string;
+  difficulty: number;
+  attempts: number;
+  hintsUsed: number;
+  solveTimeSeconds: number;
+  coins: number;
+  xp: number;
+}
+
 interface MissionCardProps {
   mission?: Mission;
-  onComplete?: () => void;
+  onComplete?: (result: MissionResult) => void;
 }
 
 const defaultMission: Mission = {
@@ -33,6 +44,8 @@ const MissionCard = ({ mission, onComplete }: MissionCardProps) => {
   const [showReward, setShowReward] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [hintsUsed, setHintsUsed] = useState(0);
+  const startTime = useRef(Date.now());
 
   const isCorrect = selected && m.options.find((o) => o.id === selected)?.correct;
 
@@ -49,7 +62,25 @@ const MissionCard = ({ mission, onComplete }: MissionCardProps) => {
     setSelected(null);
     setSubmitted(false);
     setShowReward(false);
-    if (attempts >= 1) setShowHint(true);
+    if (attempts >= 1 && !showHint) {
+      setShowHint(true);
+      setHintsUsed((h) => h + 1);
+    }
+  };
+
+  const handleComplete = () => {
+    if (!onComplete) return;
+    const solveTimeSeconds = Math.round((Date.now() - startTime.current) / 1000);
+    onComplete({
+      missionId: m.id,
+      missionType: m.type,
+      difficulty: m.difficulty,
+      attempts,
+      hintsUsed,
+      solveTimeSeconds,
+      coins: m.reward.coins,
+      xp: m.reward.xp,
+    });
   };
 
   const novaMessage = !submitted
@@ -80,24 +111,18 @@ const MissionCard = ({ mission, onComplete }: MissionCardProps) => {
         </span>
       </div>
 
-      {/* Difficulty dots */}
       <div className="mb-4 flex items-center gap-1">
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className={`h-1.5 w-4 rounded-full ${
-              i < m.difficulty ? "bg-accent" : "bg-muted"
-            }`}
+            className={`h-1.5 w-4 rounded-full ${i < m.difficulty ? "bg-accent" : "bg-muted"}`}
           />
         ))}
         <span className="ml-1 font-body text-xs text-muted-foreground">Lv.{m.difficulty}</span>
       </div>
 
-      <p className="mb-4 font-body text-sm leading-relaxed text-muted-foreground">
-        {m.question}
-      </p>
+      <p className="mb-4 font-body text-sm leading-relaxed text-muted-foreground">{m.question}</p>
 
-      {/* Hint */}
       {showHint && m.hint && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -163,7 +188,7 @@ const MissionCard = ({ mission, onComplete }: MissionCardProps) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1 }}
-                onClick={onComplete}
+                onClick={handleComplete}
                 className="rounded-xl bg-primary px-6 py-2 font-display text-sm text-primary-foreground"
               >
                 Continue →
