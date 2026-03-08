@@ -15,6 +15,8 @@ const WorldMap = ({ completedMissionIds = [], onSelectMission, missionLimit }: W
 
   const getMissionStatus = (mission: Mission, index: number): "completed" | "available" | "locked" => {
     if (completedMissionIds.includes(mission.id)) return "completed";
+    // If mission limit is set and we've hit it, lock remaining
+    if (missionLimit && missionLimit > 0 && completedMissionIds.length >= missionLimit) return "locked";
     // First uncompleted mission or previous is completed
     if (index === 0) return "available";
     const prevMission = missionBank[index - 1];
