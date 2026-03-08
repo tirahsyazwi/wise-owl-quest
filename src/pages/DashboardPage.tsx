@@ -379,7 +379,7 @@ const DashboardPage = () => {
           {activeTab === "shop" && (
             <motion.div key="shop" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center">
               {isPaid ? (
-                <CosmeticShop childId={selectedChild?.id} childName={selectedChild?.name} coins={totalCoins} onCoinsSpent={handleCoinsSpent} />
+                <CosmeticShop childId={selectedChild?.id} childName={selectedChild?.name} coins={totalCoins} onCoinsSpent={handleCoinsSpent} onOutfitChange={refetchOutfit} />
               ) : (
                 <div className="flex flex-col items-center gap-4 py-12 text-center">
                   <Lock className="h-12 w-12 text-muted-foreground" />
