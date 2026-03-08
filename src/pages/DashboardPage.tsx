@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle, ArrowLeft } from "lucide-react";
+import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle, ArrowLeft, Trophy } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -12,8 +12,9 @@ import ParentDashboard from "@/components/ParentDashboard";
 import RewardBadge from "@/components/RewardBadge";
 import AddChildModal from "@/components/AddChildModal";
 import { Mission, missionBank } from "@/data/missionBank";
+import AchievementsBoard from "@/components/AchievementsBoard";
 
-type Tab = "home" | "map" | "mission" | "parent";
+type Tab = "home" | "map" | "mission" | "achievements" | "parent";
 
 interface Child {
   id: string;
@@ -124,6 +125,7 @@ const DashboardPage = () => {
     { id: "home", label: "Home", icon: Rocket },
     { id: "map", label: "Map", icon: Map },
     { id: "mission", label: "Mission", icon: Gamepad2 },
+    { id: "achievements", label: "Badges", icon: Trophy },
     { id: "parent", label: "Parent", icon: BarChart3 },
   ];
 
@@ -258,6 +260,12 @@ const DashboardPage = () => {
                   </button>
                 </div>
               )}
+            </motion.div>
+          )}
+
+          {activeTab === "achievements" && (
+            <motion.div key="achievements" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center justify-center">
+              <AchievementsBoard childId={selectedChild?.id} childName={selectedChild?.name} />
             </motion.div>
           )}
 
