@@ -7,10 +7,11 @@ import { missionBank, Mission, getTypeColor, getZoneLabel } from "@/data/mission
 interface WorldMapProps {
   completedMissionIds?: string[];
   onSelectMission?: (mission: Mission) => void;
-  missionLimit?: number; // -1 or undefined = unlimited
+  missionLimit?: number;
+  equippedOutfit?: string | null;
 }
 
-const WorldMap = ({ completedMissionIds = [], onSelectMission, missionLimit }: WorldMapProps) => {
+const WorldMap = ({ completedMissionIds = [], onSelectMission, missionLimit, equippedOutfit }: WorldMapProps) => {
   const [hoveredMission, setHoveredMission] = useState<Mission | null>(null);
 
   const getMissionStatus = (mission: Mission, index: number): "completed" | "available" | "locked" => {
