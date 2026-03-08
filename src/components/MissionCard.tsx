@@ -2,9 +2,19 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NovaOwl from "./NovaOwl";
 import RewardBadge from "./RewardBadge";
+import { Mission, getTypeLabel, getTypeColor } from "@/data/missionBank";
 
-const sampleMission = {
+interface MissionCardProps {
+  mission?: Mission;
+  onComplete?: () => void;
+}
+
+const defaultMission: Mission = {
+  id: "default",
   title: "Broken Bridge",
+  type: "strategy",
+  zone: "foundation",
+  difficulty: 2,
   question: "You have 7 energy points. Each bridge costs energy to cross. Find the path that uses exactly 7 energy!",
   options: [
     { id: "a", label: "Bridge A (3) → Bridge C (4)", correct: true },
@@ -13,18 +23,23 @@ const sampleMission = {
     { id: "d", label: "Bridge A (3) → Bridge D (2)", correct: false },
   ],
   reward: { coins: 10, xp: 20 },
+  mapPosition: { x: 50, y: 50 },
 };
 
-const MissionCard = () => {
+const MissionCard = ({ mission, onComplete }: MissionCardProps) => {
+  const m = mission || defaultMission;
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [showReward, setShowReward] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [attempts, setAttempts] = useState(0);
 
-  const isCorrect = selected && sampleMission.options.find((o) => o.id === selected)?.correct;
+  const isCorrect = selected && m.options.find((o) => o.id === selected)?.correct;
 
   const handleSubmit = () => {
     if (!selected) return;
     setSubmitted(true);
+    setAttempts(attempts + 1);
     if (isCorrect) {
       setTimeout(() => setShowReward(true), 800);
     }
@@ -34,7 +49,20 @@ const MissionCard = () => {
     setSelected(null);
     setSubmitted(false);
     setShowReward(false);
+    if (attempts >= 1) setShowHint(true);
   };
+
+  const novaMessage = !submitted
+    ? undefined
+    : isCorrect
+    ? attempts === 1
+      ? "Whoa! That was clever! 🌟"
+      : "You got it! Never give up! 💪"
+    : attempts >= 2
+    ? "Ooooh this one is tricky. Try the hint! 🤔"
+    : "Hmm… want to try again? 🤔";
+
+  const typeColor = getTypeColor(m.type);
 
   return (
     <motion.div
@@ -42,19 +70,48 @@ const MissionCard = () => {
       animate={{ opacity: 1, y: 0 }}
       className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-xl"
     >
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-display text-xl text-accent">{sampleMission.title}</h3>
-        <span className="rounded-full bg-secondary/20 px-3 py-1 font-body text-xs font-bold text-secondary">
-          Strategy
+      <div className="mb-1 flex items-center justify-between">
+        <h3 className="font-display text-xl text-accent">{m.title}</h3>
+        <span
+          className="rounded-full px-3 py-1 font-body text-xs font-bold"
+          style={{ backgroundColor: `${typeColor}22`, color: typeColor }}
+        >
+          {getTypeLabel(m.type)}
         </span>
       </div>
 
-      <p className="mb-6 font-body text-sm leading-relaxed text-muted-foreground">
-        {sampleMission.question}
+      {/* Difficulty dots */}
+      <div className="mb-4 flex items-center gap-1">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className={`h-1.5 w-4 rounded-full ${
+              i < m.difficulty ? "bg-accent" : "bg-muted"
+            }`}
+          />
+        ))}
+        <span className="ml-1 font-body text-xs text-muted-foreground">Lv.{m.difficulty}</span>
+      </div>
+
+      <p className="mb-4 font-body text-sm leading-relaxed text-muted-foreground">
+        {m.question}
       </p>
 
+      {/* Hint */}
+      {showHint && m.hint && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="mb-4 rounded-xl border border-accent/30 bg-accent/5 px-4 py-2"
+        >
+          <p className="font-body text-xs text-accent">
+            💡 <span className="font-semibold">Hint:</span> {m.hint}
+          </p>
+        </motion.div>
+      )}
+
       <div className="mb-6 flex flex-col gap-3">
-        {sampleMission.options.map((option) => {
+        {m.options.map((option) => {
           const isSelected = selected === option.id;
           const showResult = submitted && isSelected;
           return (
@@ -99,19 +156,26 @@ const MissionCard = () => {
             animate={{ opacity: 1 }}
             className="flex flex-col items-center gap-4"
           >
-            <NovaOwl
-              size="sm"
-              message={isCorrect ? "Whoa! That was clever! 🌟" : "Hmm… want to try again? 🤔"}
-            />
-            {showReward && <RewardBadge coins={sampleMission.reward.coins} xp={sampleMission.reward.xp} />}
-            {!isCorrect && (
+            {novaMessage && <NovaOwl size="sm" message={novaMessage} />}
+            {showReward && <RewardBadge coins={m.reward.coins} xp={m.reward.xp} />}
+            {isCorrect && onComplete ? (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+                onClick={onComplete}
+                className="rounded-xl bg-primary px-6 py-2 font-display text-sm text-primary-foreground"
+              >
+                Continue →
+              </motion.button>
+            ) : !isCorrect ? (
               <button
                 onClick={handleReset}
                 className="rounded-xl bg-secondary px-6 py-2 font-body text-sm font-bold text-secondary-foreground"
               >
                 Try Again
               </button>
-            )}
+            ) : null}
           </motion.div>
         )}
       </AnimatePresence>

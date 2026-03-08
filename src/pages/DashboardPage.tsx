@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle } from "lucide-react";
+import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import MissionCard from "@/components/MissionCard";
 import ParentDashboard from "@/components/ParentDashboard";
 import RewardBadge from "@/components/RewardBadge";
 import AddChildModal from "@/components/AddChildModal";
+import { Mission, missionBank } from "@/data/missionBank";
 
 type Tab = "home" | "map" | "mission" | "parent";
 
@@ -29,6 +30,10 @@ const DashboardPage = () => {
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
   const [showAddChild, setShowAddChild] = useState(false);
   const [loadingChildren, setLoadingChildren] = useState(true);
+  const [activeMission, setActiveMission] = useState<Mission | null>(null);
+  const [completedMissions, setCompletedMissions] = useState<string[]>([]);
+  const [totalCoins, setTotalCoins] = useState(0);
+  const [totalXp, setTotalXp] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -61,6 +66,22 @@ const DashboardPage = () => {
     navigate("/");
   };
 
+  const handleSelectMission = (mission: Mission) => {
+    setActiveMission(mission);
+    setActiveTab("mission");
+  };
+
+  const handleMissionComplete = () => {
+    if (activeMission) {
+      setCompletedMissions((prev) => [...prev, activeMission.id]);
+      setTotalCoins((prev) => prev + activeMission.reward.coins);
+      setTotalXp((prev) => prev + activeMission.reward.xp);
+      toast.success(`+${activeMission.reward.coins} coins, +${activeMission.reward.xp} XP!`);
+      setActiveMission(null);
+      setActiveTab("map");
+    }
+  };
+
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: "home", label: "Home", icon: Rocket },
     { id: "map", label: "Map", icon: Map },
@@ -78,7 +99,6 @@ const DashboardPage = () => {
     );
   }
 
-  // No children yet - prompt to add one
   if (children.length === 0) {
     return (
       <div className="star-field flex min-h-screen flex-col items-center justify-center bg-background px-4">
@@ -98,7 +118,7 @@ const DashboardPage = () => {
         <button onClick={handleSignOut} className="mt-4 font-body text-sm text-muted-foreground hover:text-foreground">
           Sign Out
         </button>
-        <AddChildModal open={showAddChild} onClose={() => setShowAddChild(false)} onAdded={fetchChildren} />
+        <AddChildModal open={showAddChild} onClose={() => setShowAddChild(false)} onAdded={() => { fetchChildren(); }} />
       </div>
     );
   }
@@ -112,8 +132,7 @@ const DashboardPage = () => {
           <h1 className="font-display text-xl text-foreground">SparkMind</h1>
         </div>
         <div className="flex items-center gap-3">
-          <RewardBadge coins={45} xp={120} />
-          {/* Child selector */}
+          <RewardBadge coins={totalCoins} xp={totalXp} />
           {children.length > 0 && (
             <div className="flex items-center gap-1">
               {children.map((child) => (
@@ -145,7 +164,7 @@ const DashboardPage = () => {
       </header>
 
       {/* Content */}
-      <main className="relative z-10 flex flex-1 flex-col items-center px-4 py-6">
+      <main className="relative z-10 flex flex-1 flex-col items-center overflow-y-auto px-4 py-6">
         <AnimatePresence mode="wait">
           {activeTab === "home" && (
             <motion.div
@@ -159,6 +178,9 @@ const DashboardPage = () => {
               <h2 className="mt-4 font-display text-3xl leading-tight text-foreground">
                 Think. Solve. <span className="text-primary">Explore.</span>
               </h2>
+              <p className="font-body text-sm text-muted-foreground">
+                {completedMissions.length} of {missionBank.length} missions completed
+              </p>
               <button
                 onClick={() => setActiveTab("map")}
                 className="mt-4 flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 font-display text-lg text-primary-foreground shadow-lg transition-transform hover:scale-105"
@@ -173,14 +195,36 @@ const DashboardPage = () => {
           {activeTab === "map" && (
             <motion.div key="map" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="w-full max-w-2xl">
               <h2 className="mb-4 text-center font-display text-2xl text-foreground">Mission Planet</h2>
-              <WorldMap />
+              <WorldMap
+                completedMissionIds={completedMissions}
+                onSelectMission={handleSelectMission}
+              />
             </motion.div>
           )}
 
           {activeTab === "mission" && (
             <motion.div key="mission" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center justify-center">
-              <h2 className="mb-6 font-display text-2xl text-foreground">Active Mission</h2>
-              <MissionCard />
+              {activeMission ? (
+                <>
+                  <button
+                    onClick={() => { setActiveMission(null); setActiveTab("map"); }}
+                    className="mb-4 flex items-center gap-1 self-start font-body text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    <ArrowLeft className="h-4 w-4" /> Back to Map
+                  </button>
+                  <MissionCard mission={activeMission} onComplete={handleMissionComplete} />
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-4">
+                  <NovaOwl size="md" message="Pick a mission from the map first! 🗺️" />
+                  <button
+                    onClick={() => setActiveTab("map")}
+                    className="rounded-xl bg-primary px-6 py-3 font-display text-sm text-primary-foreground"
+                  >
+                    Go to Map
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
 
