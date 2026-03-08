@@ -15,7 +15,7 @@ interface CosmeticShopProps {
 
 type CategoryFilter = "all" | "owl-outfit" | "spaceship";
 
-const CosmeticShop = ({ childId, childName, coins, onCoinsSpent }: CosmeticShopProps) => {
+const CosmeticShop = ({ childId, childName, coins, onCoinsSpent, onOutfitChange }: CosmeticShopProps) => {
   const [purchasedIds, setPurchasedIds] = useState<Set<string>>(new Set());
   const [equippedIds, setEquippedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
