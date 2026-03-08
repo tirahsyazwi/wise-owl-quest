@@ -14,7 +14,7 @@ import AddChildModal from "@/components/AddChildModal";
 import { Mission, missionBank } from "@/data/missionBank";
 import AchievementsBoard from "@/components/AchievementsBoard";
 
-type Tab = "home" | "map" | "mission" | "parent";
+type Tab = "home" | "map" | "mission" | "achievements" | "parent";
 
 interface Child {
   id: string;
