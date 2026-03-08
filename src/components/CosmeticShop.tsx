@@ -100,6 +100,7 @@ const CosmeticShop = ({ childId, childName, coins, onCoinsSpent, onOutfitChange 
         return next;
       });
     }
+    onOutfitChange?.();
   };
 
   const playPurchaseSound = () => {
