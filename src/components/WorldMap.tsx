@@ -103,6 +103,7 @@ const WorldMap = ({ completedMissionIds = [], onSelectMission, missionLimit, equ
       <div className="absolute bottom-3 right-3" style={{ zIndex: 3 }}>
         <NovaOwl
           size="sm"
+          equippedOutfit={equippedOutfit}
           message={
             hoveredMission
               ? hoveredMission.title

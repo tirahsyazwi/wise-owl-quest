@@ -349,7 +349,7 @@ const DashboardPage = () => {
           {activeTab === "map" && (
             <motion.div key="map" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="w-full max-w-2xl">
               <h2 className="mb-4 text-center font-display text-2xl text-foreground">Mission Planet</h2>
-              <WorldMap completedMissionIds={completedMissions} onSelectMission={handleSelectMission} missionLimit={maxMissions} />
+              <WorldMap completedMissionIds={completedMissions} onSelectMission={handleSelectMission} missionLimit={maxMissions} equippedOutfit={equippedOutfitId} />
             </motion.div>
           )}
 
