@@ -87,6 +87,10 @@ const DashboardPage = () => {
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
+    if (!authLoading && user && isExpired) navigate("/pricing");
+  }, [isExpired, authLoading, user, navigate]);
+
+  useEffect(() => {
     if (user) fetchChildren();
   }, [user]);
 
