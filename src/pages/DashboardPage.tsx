@@ -285,6 +285,21 @@ const DashboardPage = () => {
         </div>
       </header>
 
+      {subscription?.plan === "trial" && isActive && (
+        <div className="relative z-10 flex items-center justify-between bg-accent/10 px-4 py-2 border-b border-border">
+          <p className="font-body text-xs text-accent">
+            <Crown className="mr-1 inline h-3 w-3" />
+            Trial: {daysLeft} day{daysLeft !== 1 ? "s" : ""} left
+          </p>
+          <button
+            onClick={() => navigate("/pricing")}
+            className="rounded-lg bg-accent px-3 py-1 font-display text-xs text-accent-foreground hover:brightness-110"
+          >
+            Upgrade
+          </button>
+        </div>
+      )}
+
       <main className="relative z-10 flex flex-1 flex-col items-center overflow-y-auto px-4 py-6">
         <AnimatePresence mode="wait">
           {activeTab === "home" && (
