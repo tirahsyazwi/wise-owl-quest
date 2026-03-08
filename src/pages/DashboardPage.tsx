@@ -69,7 +69,6 @@ const computeAchievementStats = (attempts: any[]): AchievementStats => {
 const DashboardPage = () => {
   const { user, signOut, loading: authLoading } = useAuth();
   const { subscription, isActive, isExpired, isPaid, daysLeft, maxMissions, maxChildren } = useSubscription();
-  const { equippedOutfitId, refetch: refetchOutfit } = useEquippedOutfit(selectedChild?.id);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("home");
   const [children, setChildren] = useState<Child[]>([]);
@@ -83,6 +82,7 @@ const DashboardPage = () => {
   const [celebrationBadge, setCelebrationBadge] = useState<Achievement | null>(null);
   const previousEarnedRef = useRef<Set<string>>(new Set());
   const allAttemptsRef = useRef<any[]>([]);
+  const { equippedOutfitId, refetch: refetchOutfit } = useEquippedOutfit(selectedChild?.id);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/login");
