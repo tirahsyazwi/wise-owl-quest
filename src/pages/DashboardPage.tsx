@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle, ArrowLeft, Trophy, ShoppingBag } from "lucide-react";
+import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle, ArrowLeft, Trophy, ShoppingBag, Crown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import NovaOwl from "@/components/NovaOwl";
@@ -66,6 +67,7 @@ const computeAchievementStats = (attempts: any[]): AchievementStats => {
 
 const DashboardPage = () => {
   const { user, signOut, loading: authLoading } = useAuth();
+  const { subscription, isActive, daysLeft } = useSubscription();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("home");
   const [children, setChildren] = useState<Child[]>([]);
@@ -282,6 +284,21 @@ const DashboardPage = () => {
           </button>
         </div>
       </header>
+
+      {subscription?.plan === "trial" && isActive && (
+        <div className="relative z-10 flex items-center justify-between bg-accent/10 px-4 py-2 border-b border-border">
+          <p className="font-body text-xs text-accent">
+            <Crown className="mr-1 inline h-3 w-3" />
+            Trial: {daysLeft} day{daysLeft !== 1 ? "s" : ""} left
+          </p>
+          <button
+            onClick={() => navigate("/pricing")}
+            className="rounded-lg bg-accent px-3 py-1 font-display text-xs text-accent-foreground hover:brightness-110"
+          >
+            Upgrade
+          </button>
+        </div>
+      )}
 
       <main className="relative z-10 flex flex-1 flex-col items-center overflow-y-auto px-4 py-6">
         <AnimatePresence mode="wait">
