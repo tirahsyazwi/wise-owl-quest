@@ -56,6 +56,11 @@ export const useSubscription = () => {
     ? Math.max(0, Math.ceil((new Date(subscription.expires_at).getTime() - Date.now()) / 86400000))
     : 0;
 
+  const currentPlan = subscription?.plan || "trial";
+  const limits = PLAN_DETAILS[currentPlan];
+  const maxMissions = limits.missions; // -1 = unlimited
+  const maxChildren = limits.children;
+
   const selectPlan = async (plan: PlanType) => {
     if (!user) return;
     const durations: Record<PlanType, string> = {
@@ -85,7 +90,16 @@ export const useSubscription = () => {
     await fetchSubscription();
   };
 
-  return { subscription, loading, isActive, isPaid, daysLeft, selectPlan, refetch: fetchSubscription };
+  const cancelPlan = async () => {
+    if (!subscription) return;
+    await supabase
+      .from("subscriptions")
+      .update({ status: "canceled" as any })
+      .eq("id", subscription.id);
+    await fetchSubscription();
+  };
+
+  return { subscription, loading, isActive, isPaid, daysLeft, maxMissions, maxChildren, selectPlan, cancelPlan, refetch: fetchSubscription };
 };
 
 function parseDuration(d: string): number {
