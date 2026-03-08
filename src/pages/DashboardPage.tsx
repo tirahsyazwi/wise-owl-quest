@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle, ArrowLeft, Trophy, ShoppingBag, Crown } from "lucide-react";
+import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle, ArrowLeft, Trophy, ShoppingBag, Crown, Settings, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
@@ -67,7 +67,7 @@ const computeAchievementStats = (attempts: any[]): AchievementStats => {
 
 const DashboardPage = () => {
   const { user, signOut, loading: authLoading } = useAuth();
-  const { subscription, isActive, daysLeft } = useSubscription();
+  const { subscription, isActive, isPaid, daysLeft, maxMissions, maxChildren } = useSubscription();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("home");
   const [children, setChildren] = useState<Child[]>([]);
@@ -145,8 +145,21 @@ const DashboardPage = () => {
   };
 
   const handleSelectMission = (mission: Mission) => {
+    // Gate: check mission limit for trial users
+    if (maxMissions > 0 && completedMissions.length >= maxMissions && !completedMissions.includes(mission.id)) {
+      toast.error("Mission limit reached! Upgrade your plan to unlock more.", { action: { label: "Upgrade", onClick: () => navigate("/pricing") } });
+      return;
+    }
     setActiveMission(mission);
     setActiveTab("mission");
+  };
+
+  const handleAddChild = () => {
+    if (maxChildren > 0 && children.length >= maxChildren) {
+      toast.error(`Your plan allows ${maxChildren} child profile${maxChildren > 1 ? "s" : ""}. Upgrade to add more!`, { action: { label: "Upgrade", onClick: () => navigate("/pricing") } });
+      return;
+    }
+    setShowAddChild(true);
   };
 
   const handleMissionComplete = async (result: MissionResult) => {
@@ -274,11 +287,14 @@ const DashboardPage = () => {
                   {child.name}
                 </button>
               ))}
-              <button onClick={() => setShowAddChild(true)} className="rounded-full p-1 text-muted-foreground hover:text-primary">
+              <button onClick={handleAddChild} className="rounded-full p-1 text-muted-foreground hover:text-primary">
                 <Plus className="h-4 w-4" />
               </button>
             </div>
           )}
+          <button onClick={() => navigate("/settings")} className="rounded-lg p-2 text-muted-foreground hover:text-foreground">
+            <Settings className="h-4 w-4" />
+          </button>
           <button onClick={handleSignOut} className="rounded-lg p-2 text-muted-foreground hover:text-foreground">
             <LogOut className="h-4 w-4" />
           </button>
@@ -325,7 +341,7 @@ const DashboardPage = () => {
           {activeTab === "map" && (
             <motion.div key="map" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="w-full max-w-2xl">
               <h2 className="mb-4 text-center font-display text-2xl text-foreground">Mission Planet</h2>
-              <WorldMap completedMissionIds={completedMissions} onSelectMission={handleSelectMission} />
+              <WorldMap completedMissionIds={completedMissions} onSelectMission={handleSelectMission} missionLimit={maxMissions} />
             </motion.div>
           )}
 
@@ -354,7 +370,16 @@ const DashboardPage = () => {
 
           {activeTab === "shop" && (
             <motion.div key="shop" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center">
-              <CosmeticShop childId={selectedChild?.id} childName={selectedChild?.name} coins={totalCoins} onCoinsSpent={handleCoinsSpent} />
+              {isPaid ? (
+                <CosmeticShop childId={selectedChild?.id} childName={selectedChild?.name} coins={totalCoins} onCoinsSpent={handleCoinsSpent} />
+              ) : (
+                <div className="flex flex-col items-center gap-4 py-12 text-center">
+                  <Lock className="h-12 w-12 text-muted-foreground" />
+                  <h3 className="font-display text-xl text-foreground">Shop Locked</h3>
+                  <p className="max-w-xs font-body text-sm text-muted-foreground">Upgrade to Explorer or Galaxy Pass to unlock the cosmetic shop!</p>
+                  <button onClick={() => navigate("/pricing")} className="rounded-xl bg-primary px-6 py-3 font-display text-sm text-primary-foreground">Upgrade Now</button>
+                </div>
+              )}
             </motion.div>
           )}
 
