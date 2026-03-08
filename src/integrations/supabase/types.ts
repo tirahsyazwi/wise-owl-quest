@@ -127,6 +127,38 @@ export type Database = {
         }
         Relationships: []
       }
+      purchased_items: {
+        Row: {
+          child_id: string
+          equipped: boolean
+          id: string
+          item_id: string
+          purchased_at: string
+        }
+        Insert: {
+          child_id: string
+          equipped?: boolean
+          id?: string
+          item_id: string
+          purchased_at?: string
+        }
+        Update: {
+          child_id?: string
+          equipped?: boolean
+          id?: string
+          item_id?: string
+          purchased_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchased_items_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
