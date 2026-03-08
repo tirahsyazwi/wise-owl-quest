@@ -10,6 +10,7 @@ interface CosmeticShopProps {
   childName?: string;
   coins: number;
   onCoinsSpent: (amount: number) => void;
+  onOutfitChange?: () => void;
 }
 
 type CategoryFilter = "all" | "owl-outfit" | "spaceship";
