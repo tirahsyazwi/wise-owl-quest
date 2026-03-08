@@ -365,7 +365,7 @@ const DashboardPage = () => {
                 </>
               ) : (
                 <div className="flex flex-col items-center gap-4">
-                  <NovaOwl size="md" message="Pick a mission from the map first! 🗺️" />
+                  <NovaOwl size="md" message="Pick a mission from the map first! 🗺️" equippedOutfit={equippedOutfitId} />
                   <button onClick={() => setActiveTab("map")} className="rounded-xl bg-primary px-6 py-3 font-display text-sm text-primary-foreground">
                     Go to Map
                   </button>
