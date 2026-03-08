@@ -50,6 +50,12 @@ const PricingPage = () => {
           <p className="mt-2 font-body text-muted-foreground">Unlock the full SparkMind experience</p>
         </motion.div>
 
+        {isExpired && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 w-full max-w-md rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-center">
+            <p className="font-display text-sm text-destructive">Your plan has expired!</p>
+            <p className="font-body text-xs text-muted-foreground">Choose a plan below to continue your adventure.</p>
+          </motion.div>
+        )}
         <div className="mt-10 grid w-full max-w-4xl gap-6 md:grid-cols-3">
           {plans.map((plan, i) => {
             const detail = PLAN_DETAILS[plan];
