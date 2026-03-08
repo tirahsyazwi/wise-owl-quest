@@ -16,7 +16,7 @@ const accents: Record<PlanType, string> = {
 const PricingPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { subscription, selectPlan, loading } = useSubscription();
+  const { subscription, selectPlan, loading, isExpired } = useSubscription();
   const [selecting, setSelecting] = useState<PlanType | null>(null);
 
   const handleSelect = async (plan: PlanType) => {
