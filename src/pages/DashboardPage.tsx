@@ -370,7 +370,16 @@ const DashboardPage = () => {
 
           {activeTab === "shop" && (
             <motion.div key="shop" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center">
-              <CosmeticShop childId={selectedChild?.id} childName={selectedChild?.name} coins={totalCoins} onCoinsSpent={handleCoinsSpent} />
+              {isPaid ? (
+                <CosmeticShop childId={selectedChild?.id} childName={selectedChild?.name} coins={totalCoins} onCoinsSpent={handleCoinsSpent} />
+              ) : (
+                <div className="flex flex-col items-center gap-4 py-12 text-center">
+                  <Lock className="h-12 w-12 text-muted-foreground" />
+                  <h3 className="font-display text-xl text-foreground">Shop Locked</h3>
+                  <p className="max-w-xs font-body text-sm text-muted-foreground">Upgrade to Explorer or Galaxy Pass to unlock the cosmetic shop!</p>
+                  <button onClick={() => navigate("/pricing")} className="rounded-xl bg-primary px-6 py-3 font-display text-sm text-primary-foreground">Upgrade Now</button>
+                </div>
+              )}
             </motion.div>
           )}
 
