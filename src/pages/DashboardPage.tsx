@@ -229,8 +229,8 @@ const DashboardPage = () => {
   };
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
-    { id: "home", label: "Home", icon: Rocket },
-    { id: "map", label: "Map", icon: Map },
+    { id: "home", label: "Dashboard", icon: Rocket },
+    { id: "map", label: "Missions", icon: Map },
     { id: "shop", label: "Shop", icon: ShoppingBag },
     { id: "achievements", label: "Badges", icon: Trophy },
     { id: "parent", label: "Parent", icon: BarChart3 },
