@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle, ArrowLeft, Trophy, ShoppingBag } from "lucide-react";
+import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle, ArrowLeft, Trophy, ShoppingBag, Crown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import NovaOwl from "@/components/NovaOwl";
