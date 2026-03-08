@@ -67,6 +67,7 @@ const computeAchievementStats = (attempts: any[]): AchievementStats => {
 
 const DashboardPage = () => {
   const { user, signOut, loading: authLoading } = useAuth();
+  const { subscription, isActive, daysLeft } = useSubscription();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("home");
   const [children, setChildren] = useState<Child[]>([]);
