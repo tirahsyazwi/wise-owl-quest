@@ -1,0 +1,218 @@
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import NovaOwl from "@/components/NovaOwl";
+import WorldMap from "@/components/WorldMap";
+import MissionCard from "@/components/MissionCard";
+import ParentDashboard from "@/components/ParentDashboard";
+import RewardBadge from "@/components/RewardBadge";
+import AddChildModal from "@/components/AddChildModal";
+
+type Tab = "home" | "map" | "mission" | "parent";
+
+interface Child {
+  id: string;
+  name: string;
+  age: number;
+  avatar: string;
+}
+
+const DashboardPage = () => {
+  const { user, signOut, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<Tab>("home");
+  const [children, setChildren] = useState<Child[]>([]);
+  const [selectedChild, setSelectedChild] = useState<Child | null>(null);
+  const [showAddChild, setShowAddChild] = useState(false);
+  const [loadingChildren, setLoadingChildren] = useState(true);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/login");
+    }
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    if (user) fetchChildren();
+  }, [user]);
+
+  const fetchChildren = async () => {
+    const { data, error } = await supabase
+      .from("children")
+      .select("*")
+      .order("created_at");
+    if (error) {
+      toast.error("Failed to load children");
+    } else {
+      setChildren(data || []);
+      if (data && data.length > 0 && !selectedChild) {
+        setSelectedChild(data[0]);
+      }
+    }
+    setLoadingChildren(false);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
+    { id: "home", label: "Home", icon: Rocket },
+    { id: "map", label: "Map", icon: Map },
+    { id: "mission", label: "Mission", icon: Gamepad2 },
+    { id: "parent", label: "Parent", icon: BarChart3 },
+  ];
+
+  if (authLoading || loadingChildren) {
+    return (
+      <div className="star-field flex min-h-screen items-center justify-center bg-background">
+        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}>
+          <Star className="h-8 w-8 text-accent" />
+        </motion.div>
+      </div>
+    );
+  }
+
+  // No children yet - prompt to add one
+  if (children.length === 0) {
+    return (
+      <div className="star-field flex min-h-screen flex-col items-center justify-center bg-background px-4">
+        <NovaOwl size="lg" message="Let's set up your explorer's profile!" />
+        <h2 className="mt-6 font-display text-2xl text-foreground">Add Your Child</h2>
+        <p className="mt-2 max-w-sm text-center font-body text-sm text-muted-foreground">
+          Create a profile for your child to start their thinking adventure.
+        </p>
+        <button
+          onClick={() => setShowAddChild(true)}
+          className="mt-6 flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 font-display text-lg text-primary-foreground shadow-lg transition-transform hover:scale-105"
+          style={{ boxShadow: "var(--shadow-glow-teal)" }}
+        >
+          <Plus className="h-5 w-5" />
+          Add Child
+        </button>
+        <button onClick={handleSignOut} className="mt-4 font-body text-sm text-muted-foreground hover:text-foreground">
+          Sign Out
+        </button>
+        <AddChildModal open={showAddChild} onClose={() => setShowAddChild(false)} onAdded={fetchChildren} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="star-field flex min-h-screen flex-col bg-background">
+      {/* Header */}
+      <header className="relative z-10 flex items-center justify-between border-b border-border px-4 py-3">
+        <div className="flex items-center gap-2">
+          <Star className="h-6 w-6 text-accent" />
+          <h1 className="font-display text-xl text-foreground">SparkMind</h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <RewardBadge coins={45} xp={120} />
+          {/* Child selector */}
+          {children.length > 0 && (
+            <div className="flex items-center gap-1">
+              {children.map((child) => (
+                <button
+                  key={child.id}
+                  onClick={() => setSelectedChild(child)}
+                  className={`flex items-center gap-1 rounded-full px-3 py-1 font-body text-xs font-bold transition-all ${
+                    selectedChild?.id === child.id
+                      ? "bg-primary/20 text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <UserCircle className="h-4 w-4" />
+                  {child.name}
+                </button>
+              ))}
+              <button
+                onClick={() => setShowAddChild(true)}
+                className="rounded-full p-1 text-muted-foreground hover:text-primary"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+          <button onClick={handleSignOut} className="rounded-lg p-2 text-muted-foreground hover:text-foreground">
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+      </header>
+
+      {/* Content */}
+      <main className="relative z-10 flex flex-1 flex-col items-center px-4 py-6">
+        <AnimatePresence mode="wait">
+          {activeTab === "home" && (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="flex flex-1 flex-col items-center justify-center gap-6 text-center"
+            >
+              <NovaOwl size="lg" message={`Welcome back, ${selectedChild?.name}! Ready for today's mission? 🚀`} />
+              <h2 className="mt-4 font-display text-3xl leading-tight text-foreground">
+                Think. Solve. <span className="text-primary">Explore.</span>
+              </h2>
+              <button
+                onClick={() => setActiveTab("map")}
+                className="mt-4 flex items-center gap-2 rounded-2xl bg-primary px-8 py-4 font-display text-lg text-primary-foreground shadow-lg transition-transform hover:scale-105"
+                style={{ boxShadow: "var(--shadow-glow-teal)" }}
+              >
+                <Rocket className="h-5 w-5" />
+                Start Mission
+              </button>
+            </motion.div>
+          )}
+
+          {activeTab === "map" && (
+            <motion.div key="map" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="w-full max-w-2xl">
+              <h2 className="mb-4 text-center font-display text-2xl text-foreground">Mission Planet</h2>
+              <WorldMap />
+            </motion.div>
+          )}
+
+          {activeTab === "mission" && (
+            <motion.div key="mission" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center justify-center">
+              <h2 className="mb-6 font-display text-2xl text-foreground">Active Mission</h2>
+              <MissionCard />
+            </motion.div>
+          )}
+
+          {activeTab === "parent" && (
+            <motion.div key="parent" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center justify-center">
+              <ParentDashboard />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      {/* Bottom Nav */}
+      <nav className="relative z-10 border-t border-border bg-card/80 backdrop-blur-lg">
+        <div className="flex items-center justify-around py-2">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
+                activeTab === tab.id ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <tab.icon className="h-5 w-5" />
+              <span className="font-body text-xs font-semibold">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
+
+      <AddChildModal open={showAddChild} onClose={() => setShowAddChild(false)} onAdded={fetchChildren} />
+    </div>
+  );
+};
+
+export default DashboardPage;
