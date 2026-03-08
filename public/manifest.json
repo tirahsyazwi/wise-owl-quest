@@ -1,0 +1,17 @@
+{
+  "name": "SparkMind",
+  "short_name": "SparkMind",
+  "description": "Train thinking skills through fun space missions",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#141a2e",
+  "theme_color": "#141a2e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}
