@@ -263,6 +263,12 @@ const DashboardPage = () => {
             </motion.div>
           )}
 
+          {activeTab === "achievements" && (
+            <motion.div key="achievements" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center justify-center">
+              <AchievementsBoard childId={selectedChild?.id} childName={selectedChild?.name} />
+            </motion.div>
+          )}
+
           {activeTab === "parent" && (
             <motion.div key="parent" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center justify-center">
               <ParentDashboard childId={selectedChild?.id} childName={selectedChild?.name} />
