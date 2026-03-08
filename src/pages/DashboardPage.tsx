@@ -67,7 +67,7 @@ const computeAchievementStats = (attempts: any[]): AchievementStats => {
 
 const DashboardPage = () => {
   const { user, signOut, loading: authLoading } = useAuth();
-  const { subscription, isActive, isPaid, daysLeft, maxMissions, maxChildren } = useSubscription();
+  const { subscription, isActive, isExpired, isPaid, daysLeft, maxMissions, maxChildren } = useSubscription();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("home");
   const [children, setChildren] = useState<Child[]>([]);
@@ -85,6 +85,10 @@ const DashboardPage = () => {
   useEffect(() => {
     if (!authLoading && !user) navigate("/login");
   }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    if (!authLoading && user && isExpired) navigate("/pricing");
+  }, [isExpired, authLoading, user, navigate]);
 
   useEffect(() => {
     if (user) fetchChildren();

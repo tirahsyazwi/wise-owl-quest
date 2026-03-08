@@ -51,6 +51,7 @@ export const useSubscription = () => {
   };
 
   const isActive = subscription?.status === "active" && new Date(subscription.expires_at) > new Date();
+  const isExpired = subscription !== null && !isActive;
   const isPaid = isActive && subscription?.plan !== "trial";
   const daysLeft = subscription?.expires_at
     ? Math.max(0, Math.ceil((new Date(subscription.expires_at).getTime() - Date.now()) / 86400000))
@@ -99,7 +100,7 @@ export const useSubscription = () => {
     await fetchSubscription();
   };
 
-  return { subscription, loading, isActive, isPaid, daysLeft, maxMissions, maxChildren, selectPlan, cancelPlan, refetch: fetchSubscription };
+  return { subscription, loading, isActive, isExpired, isPaid, daysLeft, maxMissions, maxChildren, selectPlan, cancelPlan, refetch: fetchSubscription };
 };
 
 function parseDuration(d: string): number {
