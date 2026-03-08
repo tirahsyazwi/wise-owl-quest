@@ -12,6 +12,7 @@ import ParentDashboard from "@/components/ParentDashboard";
 import RewardBadge from "@/components/RewardBadge";
 import AddChildModal from "@/components/AddChildModal";
 import { Mission, missionBank } from "@/data/missionBank";
+import AchievementsBoard from "@/components/AchievementsBoard";
 
 type Tab = "home" | "map" | "mission" | "parent";
 
