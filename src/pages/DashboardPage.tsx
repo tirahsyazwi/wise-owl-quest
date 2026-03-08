@@ -9,6 +9,7 @@ import NovaOwl from "@/components/NovaOwl";
 import WorldMap from "@/components/WorldMap";
 import MissionCard, { MissionResult } from "@/components/MissionCard";
 import ParentDashboard from "@/components/ParentDashboard";
+import WeeklyProgressReport from "@/components/WeeklyProgressReport";
 import RewardBadge from "@/components/RewardBadge";
 import AddChildModal from "@/components/AddChildModal";
 import { Mission, missionBank } from "@/data/missionBank";
