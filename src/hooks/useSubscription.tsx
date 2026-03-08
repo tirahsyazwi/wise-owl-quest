@@ -100,7 +100,7 @@ export const useSubscription = () => {
     await fetchSubscription();
   };
 
-  return { subscription, loading, isActive, isPaid, daysLeft, maxMissions, maxChildren, selectPlan, cancelPlan, refetch: fetchSubscription };
+  return { subscription, loading, isActive, isExpired, isPaid, daysLeft, maxMissions, maxChildren, selectPlan, cancelPlan, refetch: fetchSubscription };
 };
 
 function parseDuration(d: string): number {
