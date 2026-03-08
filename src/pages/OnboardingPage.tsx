@@ -152,7 +152,7 @@ const OnboardingPage = () => {
               </p>
               <MissionCard
                 mission={onboardingMissions[step.missionIndex ?? 0]}
-                onComplete={goNext}
+                onComplete={() => goNext()}
               />
             </motion.div>
           )}
