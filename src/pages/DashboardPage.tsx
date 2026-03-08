@@ -9,6 +9,7 @@ import NovaOwl from "@/components/NovaOwl";
 import WorldMap from "@/components/WorldMap";
 import MissionCard, { MissionResult } from "@/components/MissionCard";
 import ParentDashboard from "@/components/ParentDashboard";
+import WeeklyProgressReport from "@/components/WeeklyProgressReport";
 import RewardBadge from "@/components/RewardBadge";
 import AddChildModal from "@/components/AddChildModal";
 import { Mission, missionBank } from "@/data/missionBank";
@@ -270,8 +271,11 @@ const DashboardPage = () => {
           )}
 
           {activeTab === "parent" && (
-            <motion.div key="parent" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center justify-center">
-              <ParentDashboard childId={selectedChild?.id} childName={selectedChild?.name} />
+            <motion.div key="parent" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center pb-4">
+              <WeeklyProgressReport childId={selectedChild?.id} childName={selectedChild?.name} />
+              <div className="mt-6">
+                <ParentDashboard childId={selectedChild?.id} childName={selectedChild?.name} />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
