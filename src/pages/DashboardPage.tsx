@@ -229,8 +229,8 @@ const DashboardPage = () => {
   };
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
-    { id: "home", label: "Home", icon: Rocket },
-    { id: "map", label: "Map", icon: Map },
+    { id: "home", label: "Dashboard", icon: Rocket },
+    { id: "map", label: "Missions", icon: Map },
     { id: "shop", label: "Shop", icon: ShoppingBag },
     { id: "achievements", label: "Badges", icon: Trophy },
     { id: "parent", label: "Parent", icon: BarChart3 },
@@ -408,20 +408,39 @@ const DashboardPage = () => {
         </AnimatePresence>
       </main>
 
-      <nav className="relative z-10 border-t border-border bg-card/80 backdrop-blur-lg">
-        <div className="flex items-center justify-around py-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center gap-1 px-3 py-2 transition-colors ${
-                activeTab === tab.id ? "text-primary" : "text-muted-foreground"
-              }`}
-            >
-              <tab.icon className="h-5 w-5" />
-              <span className="font-body text-[10px] font-semibold">{tab.label}</span>
-            </button>
-          ))}
+      <nav className="safe-bottom relative z-10 border-t border-border bg-card/90 backdrop-blur-xl">
+        <div className="flex items-center justify-around py-1 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative flex flex-col items-center gap-0.5 rounded-xl px-3 py-2 transition-all ${
+                  isActive
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="nav-indicator"
+                    className="absolute -top-1 h-0.5 w-6 rounded-full bg-primary"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <tab.icon className={`h-5 w-5 transition-transform ${isActive ? "scale-110" : ""}`} />
+                <span className="font-body text-[10px] font-semibold">{tab.label}</span>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => navigate("/settings")}
+            className={`relative flex flex-col items-center gap-0.5 rounded-xl px-3 py-2 text-muted-foreground transition-all hover:text-foreground`}
+          >
+            <Settings className="h-5 w-5" />
+            <span className="font-body text-[10px] font-semibold">Settings</span>
+          </button>
         </div>
       </nav>
 
