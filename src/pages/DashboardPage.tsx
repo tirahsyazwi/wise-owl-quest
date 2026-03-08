@@ -224,6 +224,8 @@ const DashboardPage = () => {
 
   const handleCoinsSpent = (amount: number) => {
     setTotalCoins((prev) => prev - amount);
+    // Refetch outfit in case something was equipped
+    setTimeout(() => refetchOutfit(), 500);
   };
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
