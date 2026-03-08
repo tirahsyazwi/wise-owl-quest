@@ -7,10 +7,11 @@ import { missionBank, Mission, getTypeColor, getZoneLabel } from "@/data/mission
 interface WorldMapProps {
   completedMissionIds?: string[];
   onSelectMission?: (mission: Mission) => void;
-  missionLimit?: number; // -1 or undefined = unlimited
+  missionLimit?: number;
+  equippedOutfit?: string | null;
 }
 
-const WorldMap = ({ completedMissionIds = [], onSelectMission, missionLimit }: WorldMapProps) => {
+const WorldMap = ({ completedMissionIds = [], onSelectMission, missionLimit, equippedOutfit }: WorldMapProps) => {
   const [hoveredMission, setHoveredMission] = useState<Mission | null>(null);
 
   const getMissionStatus = (mission: Mission, index: number): "completed" | "available" | "locked" => {
@@ -102,6 +103,7 @@ const WorldMap = ({ completedMissionIds = [], onSelectMission, missionLimit }: W
       <div className="absolute bottom-3 right-3" style={{ zIndex: 3 }}>
         <NovaOwl
           size="sm"
+          equippedOutfit={equippedOutfit}
           message={
             hoveredMission
               ? hoveredMission.title

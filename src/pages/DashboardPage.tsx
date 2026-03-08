@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Rocket, Star, Map, Gamepad2, BarChart3, LogOut, Plus, UserCircle, ArrowLeft, Trophy, ShoppingBag, Crown, Settings, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useEquippedOutfit } from "@/hooks/useEquippedOutfit";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import NovaOwl from "@/components/NovaOwl";
@@ -81,6 +82,7 @@ const DashboardPage = () => {
   const [celebrationBadge, setCelebrationBadge] = useState<Achievement | null>(null);
   const previousEarnedRef = useRef<Set<string>>(new Set());
   const allAttemptsRef = useRef<any[]>([]);
+  const { equippedOutfitId, refetch: refetchOutfit } = useEquippedOutfit(selectedChild?.id);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/login");
@@ -222,6 +224,8 @@ const DashboardPage = () => {
 
   const handleCoinsSpent = (amount: number) => {
     setTotalCoins((prev) => prev - amount);
+    // Refetch outfit in case something was equipped
+    setTimeout(() => refetchOutfit(), 500);
   };
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
@@ -324,7 +328,7 @@ const DashboardPage = () => {
         <AnimatePresence mode="wait">
           {activeTab === "home" && (
             <motion.div key="home" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
-              <NovaOwl size="lg" message={`Welcome back, ${selectedChild?.name}! Ready for today's mission? 🚀`} />
+              <NovaOwl size="lg" message={`Welcome back, ${selectedChild?.name}! Ready for today's mission? 🚀`} equippedOutfit={equippedOutfitId} />
               <h2 className="mt-4 font-display text-3xl leading-tight text-foreground">
                 Think. Solve. <span className="text-primary">Explore.</span>
               </h2>
@@ -345,7 +349,7 @@ const DashboardPage = () => {
           {activeTab === "map" && (
             <motion.div key="map" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="w-full max-w-2xl">
               <h2 className="mb-4 text-center font-display text-2xl text-foreground">Mission Planet</h2>
-              <WorldMap completedMissionIds={completedMissions} onSelectMission={handleSelectMission} missionLimit={maxMissions} />
+              <WorldMap completedMissionIds={completedMissions} onSelectMission={handleSelectMission} missionLimit={maxMissions} equippedOutfit={equippedOutfitId} />
             </motion.div>
           )}
 
@@ -363,7 +367,7 @@ const DashboardPage = () => {
                 </>
               ) : (
                 <div className="flex flex-col items-center gap-4">
-                  <NovaOwl size="md" message="Pick a mission from the map first! 🗺️" />
+                  <NovaOwl size="md" message="Pick a mission from the map first! 🗺️" equippedOutfit={equippedOutfitId} />
                   <button onClick={() => setActiveTab("map")} className="rounded-xl bg-primary px-6 py-3 font-display text-sm text-primary-foreground">
                     Go to Map
                   </button>
@@ -375,7 +379,7 @@ const DashboardPage = () => {
           {activeTab === "shop" && (
             <motion.div key="shop" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center">
               {isPaid ? (
-                <CosmeticShop childId={selectedChild?.id} childName={selectedChild?.name} coins={totalCoins} onCoinsSpent={handleCoinsSpent} />
+                <CosmeticShop childId={selectedChild?.id} childName={selectedChild?.name} coins={totalCoins} onCoinsSpent={handleCoinsSpent} onOutfitChange={refetchOutfit} />
               ) : (
                 <div className="flex flex-col items-center gap-4 py-12 text-center">
                   <Lock className="h-12 w-12 text-muted-foreground" />

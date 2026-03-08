@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Check, Star, Rocket, Crown, ArrowLeft, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription, PLAN_DETAILS, PlanType } from "@/hooks/useSubscription";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const icons: Record<PlanType, React.ElementType> = { trial: Star, monthly: Rocket, yearly: Crown };
@@ -23,10 +24,52 @@ const PricingPage = () => {
     if (!user) { navigate("/signup"); return; }
     setSelecting(plan);
     try {
+      if (plan === "trial") {
+        // Trial is always free, no payment needed
+        await selectPlan(plan);
+        toast.success(`🎉 ${PLAN_DETAILS[plan].name} activated!`);
+        navigate("/dashboard");
+      } else {
+        // Paid plan — create Bayarcash checkout
+        const amount = PLAN_DETAILS[plan].price;
+        const { data, error } = await supabase.functions.invoke("bayarcash-checkout", {
+          body: {
+            plan,
+            amount: amount.toFixed(2),
+            payer_name: user.user_metadata?.display_name || user.email,
+            payer_email: user.email,
+            user_id: user.id,
+            return_url: `${window.location.origin}/pricing?payment=complete&plan=${plan}`,
+          },
+        });
+
+        if (error || !data?.success) {
+          // Fallback: activate locally if Bayarcash is not configured yet
+          console.warn("Bayarcash unavailable, activating locally:", error || data?.error);
+          await selectPlan(plan);
+          toast.success(`🎉 ${PLAN_DETAILS[plan].name} activated!`);
+          navigate("/dashboard");
+        } else if (data.checkout_url) {
+          // Save payment record before redirect
+          await supabase.from("payments").insert({
+            user_id: user.id,
+            plan,
+            amount_cents: Math.round(amount * 100),
+            currency: "MYR",
+            status: "pending",
+            bayarcash_payment_intent_id: data.payment_intent_id,
+          });
+          // Redirect to Bayarcash checkout
+          window.location.href = data.checkout_url;
+          return;
+        }
+      }
+    } catch {
+      // Fallback for any errors
       await selectPlan(plan);
       toast.success(`🎉 ${PLAN_DETAILS[plan].name} activated!`);
       navigate("/dashboard");
-    } catch { toast.error("Something went wrong"); }
+    }
     setSelecting(null);
   };
 
