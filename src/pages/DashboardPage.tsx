@@ -326,7 +326,7 @@ const DashboardPage = () => {
         <AnimatePresence mode="wait">
           {activeTab === "home" && (
             <motion.div key="home" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
-              <NovaOwl size="lg" message={`Welcome back, ${selectedChild?.name}! Ready for today's mission? 🚀`} />
+              <NovaOwl size="lg" message={`Welcome back, ${selectedChild?.name}! Ready for today's mission? 🚀`} equippedOutfit={equippedOutfitId} />
               <h2 className="mt-4 font-display text-3xl leading-tight text-foreground">
                 Think. Solve. <span className="text-primary">Explore.</span>
               </h2>
