@@ -121,8 +121,10 @@ describe("Mission System", () => {
     it("second mission is locked if first not completed", () => {
       const completedMissionIds: string[] = [];
       const index = 1;
-      const prevCompleted = completedMissionIds.includes(missionBank[index - 1].id);
+      const prevId = missionBank[index - 1].id;
+      const prevCompleted = completedMissionIds.includes(prevId);
       expect(prevCompleted).toBe(false);
+      // Therefore mission is locked
     });
 
     it("second mission unlocks after first is completed", () => {

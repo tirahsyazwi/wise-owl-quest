@@ -163,7 +163,7 @@ describe("E2E Flow: Subscription Expiry", () => {
   });
 
   it("canceled subscription is treated as expired", () => {
-    const status = "canceled";
+    const status: string = "canceled";
     const expires_at = new Date(Date.now() + 86400000).toISOString();
     const isActive = status === "active" && new Date(expires_at) > new Date();
     expect(isActive).toBe(false);

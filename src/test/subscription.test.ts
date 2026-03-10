@@ -64,7 +64,7 @@ describe("Subscription Plans", () => {
     });
 
     it("isPaid when active and not trial", () => {
-      const plan = "monthly";
+      const plan: string = "monthly";
       const status = "active";
       const expires_at = new Date(Date.now() + 86400000).toISOString();
       const isActive = status === "active" && new Date(expires_at) > new Date();
