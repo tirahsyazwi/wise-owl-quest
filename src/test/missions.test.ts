@@ -130,7 +130,7 @@ describe("Mission System", () => {
     it("second mission unlocks after first is completed", () => {
       const completedMissionIds = ["m01"];
       const index = 1;
-      const isAvailable = index === 0 || completedMissionIds.includes(missionBank[index - 1].id);
+      const isAvailable = completedMissionIds.includes(missionBank[index - 1].id);
       expect(isAvailable).toBe(true);
     });
 
