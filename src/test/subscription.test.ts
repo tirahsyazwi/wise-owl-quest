@@ -64,24 +64,20 @@ describe("Subscription Plans", () => {
     });
 
     it("isPaid when active and not trial", () => {
-      const sub = {
-        plan: "monthly" as const,
-        status: "active",
-        expires_at: new Date(Date.now() + 86400000).toISOString(),
-      };
-      const isActive = sub.status === "active" && new Date(sub.expires_at) > new Date();
-      const isPaid = isActive && sub.plan !== "trial";
+      const plan = "monthly";
+      const status = "active";
+      const expires_at = new Date(Date.now() + 86400000).toISOString();
+      const isActive = status === "active" && new Date(expires_at) > new Date();
+      const isPaid = isActive && plan !== "trial";
       expect(isPaid).toBe(true);
     });
 
     it("isPaid is false for trial plan", () => {
-      const sub = {
-        plan: "trial" as const,
-        status: "active",
-        expires_at: new Date(Date.now() + 86400000).toISOString(),
-      };
-      const isActive = sub.status === "active" && new Date(sub.expires_at) > new Date();
-      const isPaid = isActive && sub.plan !== "trial";
+      const plan = "trial";
+      const status = "active";
+      const expires_at = new Date(Date.now() + 86400000).toISOString();
+      const isActive = status === "active" && new Date(expires_at) > new Date();
+      const isPaid = isActive && plan !== "trial";
       expect(isPaid).toBe(false);
     });
 
