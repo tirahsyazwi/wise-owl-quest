@@ -161,14 +161,14 @@ describe("Subscription Plans", () => {
     });
 
     it("shop is unlocked for monthly users", () => {
-      const plan = "monthly";
+      const plan: string = "monthly";
       const isActive = true;
       const isPaid = isActive && plan !== "trial";
       expect(isPaid).toBe(true);
     });
 
     it("shop is unlocked for yearly users", () => {
-      const plan = "yearly";
+      const plan: string = "yearly";
       const isActive = true;
       const isPaid = isActive && plan !== "trial";
       expect(isPaid).toBe(true);

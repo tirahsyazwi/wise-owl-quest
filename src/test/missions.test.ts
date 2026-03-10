@@ -114,15 +114,15 @@ describe("Mission System", () => {
     it("first mission is always available", () => {
       const completedMissionIds: string[] = [];
       const index = 0;
-      const isAvailable = index === 0 || completedMissionIds.includes(missionBank[index - 1].id);
+      const isAvailable = index === 0 || completedMissionIds.includes(missionBank[Math.max(0, index - 1)].id);
       expect(isAvailable).toBe(true);
     });
 
     it("second mission is locked if first not completed", () => {
       const completedMissionIds: string[] = [];
       const index = 1;
-      const isAvailable = index === 0 || completedMissionIds.includes(missionBank[index - 1].id);
-      expect(isAvailable).toBe(false);
+      const prevCompleted = completedMissionIds.includes(missionBank[index - 1].id);
+      expect(prevCompleted).toBe(false);
     });
 
     it("second mission unlocks after first is completed", () => {
