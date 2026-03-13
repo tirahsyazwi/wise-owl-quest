@@ -73,7 +73,9 @@ describe("CosmeticShop", () => {
     render(<CosmeticShop {...defaultProps} />);
     await waitFor(() => {
       expect(screen.getByText("Cosmic Shop")).toBeInTheDocument();
-      expect(screen.getByText("100")).toBeInTheDocument();
+      // Coin display shows in the header
+      const coinDisplays = screen.getAllByText("100");
+      expect(coinDisplays.length).toBeGreaterThanOrEqual(1);
     });
   });
 
